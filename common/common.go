@@ -3,6 +3,7 @@ package common
 import (
 	"net"
 	"fmt"
+	"github.com/baiyunpeng/chatRoom/const"
 )
 
 /**
@@ -26,6 +27,10 @@ func SendMessage(conn net.Conn, message string) {
 	conn.Write([]byte(message))
 }
 
-func Hello(){
+func ServerAddr() {
+	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
+}
+
+func Hello() {
 	fmt.Println("hello")
 }
