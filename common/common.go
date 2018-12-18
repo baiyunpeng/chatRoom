@@ -22,7 +22,7 @@ func Receive(conn net.Conn) string {
 /**
 发送消息
  */
-func Write(conn net.Conn, message string) {
+func SendMessage(conn net.Conn, message string) {
 	conn.Write([]byte(message))
 }
 

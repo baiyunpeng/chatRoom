@@ -4,7 +4,7 @@ import (
 	"net"
 	"fmt"
 	"github.com/baiyunpeng/chatRoom/const"
-	"github.com/baiyunpeng/chatRoom/commom"
+	"github.com/baiyunpeng/chatRoom/common"
 )
 
 func main() {
@@ -18,11 +18,11 @@ func main() {
 		fmt.Println("请输入消息内容：")
 		fmt.Scan(&message)
 		fmt.Printf("发送消息内容：%v\n", message)
-		common.Write(conn, message)
+		common.SendMessage(conn, message)
 		message = common.Receive(conn);
 		fmt.Printf("接收到服务器消息：%v\n", message)
 		if (message == constant.SERVER_CLOSE) {
-			common.Write(conn, constant.SERVER_CLOSE)
+			common.SendMessage(conn, constant.SERVER_CLOSE)
 			break;
 		}
 	}
