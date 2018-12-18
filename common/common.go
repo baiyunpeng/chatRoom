@@ -25,3 +25,7 @@ func Receive(conn net.Conn) string {
 func Write(conn net.Conn, message string) {
 	conn.Write([]byte(message))
 }
+
+func Hello(){
+	fmt.Println("hello")
+}
