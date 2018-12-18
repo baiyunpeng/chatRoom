@@ -27,6 +27,7 @@ func SendMessage(conn net.Conn, message string) {
 	conn.Write([]byte(message))
 }
 
+
 func ServerAddr()string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
 }
