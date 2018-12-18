@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	listen_socket, err := net.Listen(constant.SERVER_PROTOCOL, constant.SERVER_ADDR+":"+constant.SERVER_PORT)
+	listen_socket, err := net.Listen(constant.SERVER_PROTOCOL, common.ServerAddr())
 	if (err != nil) {
 		fmt.Println("启动监听错误")
 	}
@@ -24,7 +24,7 @@ func main() {
 		for {
 			message := common.Receive(conn)
 			if (message == constant.SERVER_CLOSE) {
-				common.SendMessage(message)
+				common.SendMessage(conn, message)
 				break;
 			}
 			fmt.Printf("接收到客户端数据：%v\n", message)

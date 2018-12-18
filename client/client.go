@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial(constant.SERVER_PROTOCOL, constant.SERVER_ADDR+":"+constant.SERVER_POR)
+	conn, err := net.Dial(constant.SERVER_PROTOCOL, constant.SERVER_ADDR+":"+constant.SERVER_PORT)
 	if (err != nil) {
 		fmt.Println("客户端连接服务器失败")
 	}
