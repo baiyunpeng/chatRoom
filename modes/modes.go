@@ -3,7 +3,7 @@ package modes
 /**
 客户端结构体
  */
-type client struct {
+type Client struct {
 	//地址
 	addr string
 	//姓名
