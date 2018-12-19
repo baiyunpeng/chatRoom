@@ -27,10 +27,34 @@ func SendMessage(conn net.Conn, message string) {
 	conn.Write([]byte(message))
 }
 
-
-func ServerAddr()string {
+/**
+hu获取服务器地址
+ */
+func ServerAddr() string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
 }
+
+func IpAddr() string {
+	var addr = "";
+	addrs, err := net.InterfaceAddrs();
+	if (err != nil) {
+		fmt.Println("获取本机IP地址错误")
+		return addr
+	}
+	for _, address := range addrs {
+		// 检查ip地址判断是否回环地址
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				fmt.Println("ip:", ipnet.IP.String())
+				addr = ipnet.IP.String();
+			}
+
+		}
+	}
+	return addr
+}
+
+
 
 func Hello() {
 	fmt.Println("hello")
