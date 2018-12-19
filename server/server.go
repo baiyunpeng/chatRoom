@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	fmt.Printf("服务端启动，地址：%v,端口号%v\n", constant.SERVER_ADDR, constant.SERVER_PORT)
 	listen_socket, err := net.Listen(constant.SERVER_PROTOCOL, common.ServerAddr())
 	if (err != nil) {
 		fmt.Println("启动监听错误")
@@ -15,7 +16,7 @@ func main() {
 	}
 	//延时关闭监听
 	defer listen_socket.Close();
-	fmt.Println("服务监听启动中...")
+	fmt.Println("服务监听启动成功，等待消息")
 	for {
 		conn, err := listen_socket.Accept();
 		if (err != nil) {
