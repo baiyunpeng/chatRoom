@@ -8,9 +8,12 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial(constant.SERVER_PROTOCOL, constant.SERVER_ADDR+":"+constant.SERVER_PORT)
+	serverAddr := getServerAddr();
+	fmt.Println("正在连接服务器，服务器地址：%v\n", serverAddr)
+	conn, err := net.Dial(constant.SERVER_PROTOCOL, serverAddr)
 	if (err != nil) {
 		fmt.Println("客户端连接服务器失败")
+		return;
 	}
 	defer conn.Close()
 	for {
@@ -28,4 +31,15 @@ func main() {
 	}
 	fmt.Println("服务器连接断开")
 	conn.Close()
+}
+
+func getServerAddr() string {
+	fmt.Println("欢迎使用聊天室...")
+	fmt.Println("------------------------------")
+	fmt.Println("请输入连接服务器地址：")
+	//服务器地址
+	var serverAddr = "";
+	fmt.Scan(&serverAddr)
+	fmt.Printf("您输入的服务器地址是：%v\n", serverAddr)
+	return serverAddr;
 }

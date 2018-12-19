@@ -11,6 +11,7 @@ func main() {
 	listen_socket, err := net.Listen(constant.SERVER_PROTOCOL, common.ServerAddr())
 	if (err != nil) {
 		fmt.Println("启动监听错误")
+		return;
 	}
 	//延时关闭监听
 	defer listen_socket.Close();
@@ -19,6 +20,7 @@ func main() {
 		conn, err := listen_socket.Accept();
 		if (err != nil) {
 			fmt.Println("启动监听失败")
+			return;
 		}
 		fmt.Println("连接服务器成功")
 		for {
