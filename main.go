@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	common.Hello()
+	fmt.Println(common.IpAddr())
 	fmt.Println(constant.SERVER_PORT)
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	serverAddr := getServerAddr();
+	serverAddr, nick := getInitData();
 	fmt.Println("正在连接服务器，服务器地址：%v\n", serverAddr)
 	conn, err := net.Dial(constant.SERVER_PROTOCOL, serverAddr)
 	if (err != nil) {
@@ -16,6 +16,12 @@ func main() {
 		return;
 	}
 	defer conn.Close()
+	var clientConnStatus = connServer(conn, serverAddr, nick);
+	if (constant.CLIENT_CONN_SUCCESS == clientConnStatus) {
+		fmt.Println("连接服务器成功")
+	} else {
+		fmt.Println("连接服务器失败")
+	}
 	for {
 		var message = "";
 		fmt.Println("请输入消息内容：")
@@ -33,13 +39,23 @@ func main() {
 	conn.Close()
 }
 
-func getServerAddr() string {
+func connServer(conn net.Conn, serverAddr, nick string) string {
+	common.SendMessage(conn, constant.CLIENT_LOGIN_PROTOCOL+nick)
+	return common.Receive(conn);
+}
+
+/**
+初始化用户信息
+ */
+func getInitData() (string, string) {
+	var addr, nick string;
 	fmt.Println("欢迎使用聊天室...")
 	fmt.Println("------------------------------")
 	fmt.Println("请输入连接服务器地址：")
 	//服务器地址
-	var serverAddr = "";
-	fmt.Scan(&serverAddr)
-	fmt.Printf("您输入的服务器地址是：%v\n", serverAddr)
-	return serverAddr;
+	fmt.Scan(&addr)
+	fmt.Printf("您输入的服务器地址是：%v\n", addr)
+	fmt.Println("请输入您的昵称：")
+	fmt.Scan(&nick)
+	return addr, nick;
 }
