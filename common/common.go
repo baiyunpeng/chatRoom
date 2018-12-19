@@ -4,14 +4,19 @@ import (
 	"net"
 	"fmt"
 	"github.com/baiyunpeng/chatRoom/const"
+	"sync"
 )
 
+var readLock sync.Mutex
+var writeLock sync.Mutex
 /**
 接收数据
  */
 func Receive(conn net.Conn) string {
 	data := make([]byte, 255)
+	readLock.Lock()
 	index, err := conn.Read(data);
+	readLock.Unlock()
 	if (err != nil) {
 		fmt.Println("数据读取失败")
 	}
@@ -24,7 +29,9 @@ func Receive(conn net.Conn) string {
 发送消息
  */
 func SendMessage(conn net.Conn, message string) {
+	writeLock.Lock();
 	conn.Write([]byte(message))
+	writeLock.Unlock()
 }
 
 /**
@@ -33,8 +40,6 @@ hu获取服务器地址
 func ServerAddr() string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
 }
-
-
 
 func Hello() {
 	fmt.Println("hello")
