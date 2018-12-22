@@ -9,7 +9,7 @@ type Client struct {
 	//姓名
 	Name string
 	//通讯内容
-	Channel chan string;
+	Channel chan Chat;
 }
 
 type Chat struct {
