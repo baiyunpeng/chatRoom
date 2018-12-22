@@ -4,11 +4,13 @@ import (
 	"net"
 	"fmt"
 	"github.com/baiyunpeng/chatRoom/const"
-	"sync"
+	"github.com/baiyunpeng/chatRoom/modes"
+	"github.com/baiyunpeng/chatRoom/common"
+	"encoding/json"
 )
 
-var readLock sync.Mutex
-var writeLock sync.Mutex
+type ConnListener func(modes.Chat)
+
 /**
 接收数据
  */
@@ -34,6 +36,19 @@ hu获取服务器地址
  */
 func ServerAddr() string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
+}
+
+func MonitorConn(conn net.Conn, listener ConnListener) {
+	go func() {
+		chat := &modes.Chat{};
+		for {
+			message := common.Receive(conn);
+			err := json.Unmarshal(message, chat);
+			if common.CheckError(err, "转换消息失败") {
+				listener(*chat);
+			}
+		}
+	}()
 }
 
 /**
