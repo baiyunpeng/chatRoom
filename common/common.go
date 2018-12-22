@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 )
 
-type ConnListener func(modes.Chat)
+type connListener func(modes.Chat)
 
 /**
 接收数据
@@ -38,7 +38,7 @@ func ServerAddr() string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
 }
 
-func MonitorConn(conn net.Conn, listener ConnListener) {
+func MonitorConn(conn net.Conn, listener connListener) {
 	go func() {
 		chat := &modes.Chat{};
 		for {
