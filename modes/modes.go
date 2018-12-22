@@ -5,9 +5,15 @@ package modes
  */
 type Client struct {
 	//地址
-	addr string
+	Addr string
 	//姓名
-	name string
-	//通讯管道
-	channel chan string
+	Name string
+}
+
+type Chat struct {
+	Name     string
+	TellName string
+	CallType string
+	Message  string
+	Group    string
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	serverAddr, nick := getInitData();
+	serverAddr, _ := getInitData();
 	fmt.Printf("正在连接服务器，服务器地址：%v\n", serverAddr)
 	conn, err := net.Dial(constant.SERVER_PROTOCOL, "10.168.62.33:8088")
 	if (err != nil) {
@@ -16,13 +16,13 @@ func main() {
 		return;
 	}
 	defer connectionClose(conn)
-	var clientConnStatus = connServer(conn, serverAddr, nick);
+/*	var clientConnStatus = connServer(conn, serverAddr, nick);
 	fmt.Println("clientConnStatus:" + clientConnStatus)
 	if (constant.CLIENT_CONN_SUCCESS == clientConnStatus) {
 		fmt.Println("连接服务器成功")
 	} else {
 		fmt.Println("连接服务器失败")
-	}
+	}*/
 	go func() {
 		for {
 			message := common.Receive(conn);

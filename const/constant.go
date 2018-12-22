@@ -1,10 +1,33 @@
 package constant
 
+/**
+服务器相关
+ */
 const (
-	SERVER_PROTOCOL       = "tcp"
-	SERVER_ADDR           = "10.168.62.33"
-	SERVER_PORT           = "8088"
-	SERVER_CLOSE          = "close"
+	SERVER_PROTOCOL = "tcp"
+	SERVER_ADDR     = "10.168.62.33"
+	SERVER_PORT     = "8088"
+	SERVER_CLOSE    = "close"
+)
+
+/**
+登录相关
+ */
+const (
 	CLIENT_LOGIN_PROTOCOL = "CLIENT:"
-	CLIENT_CONN_SUCCESS = "CLIENT_CONN_SUCCESS"
+	CLIENT_CONN_SUCCESS   = "CLIENT_CONN_SUCCESS"
+)
+
+/**
+会话相关
+ */
+const (
+	CALL_TYPE_BROADCAST = "CALL_TYPE_BROADCAST"
+	CALL_TYPE_GROUP     = "CALL_TYPE_GROUP"
+	CALL_TYPE_P2P       = "CALL_TYPE_P2P"
+	CALL_TYPE_COMMOND   = "CALL_TYPE_COMMOND"
+)
+
+const (
+	CALL_GROUP_DEFAULT = "DEFAULT_GROUP"
 )

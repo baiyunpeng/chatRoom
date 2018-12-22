@@ -5,22 +5,9 @@ import (
 	"fmt"
 	"github.com/baiyunpeng/chatRoom/const"
 	"github.com/baiyunpeng/chatRoom/common"
+	"github.com/baiyunpeng/chatRoom/modes"
 	"strings"
 )
-
-/**
-客户端结构体
- */
-type Client struct {
-	//地址
-	addr string
-	//姓名
-	name string
-	//通讯管道
-	channel chan string
-
-	conn net.Conn
-}
 
 //储存在线用户的map
 var onlieclient = make(map[string]Client)
@@ -44,11 +31,10 @@ func listenerConn(socket net.Listener) {
 		fmt.Println("服务器监听失败")
 	}
 	fmt.Println("连接服务器成功")
-	go initClient(conn);
+	initClient(conn);
 }
 
 func initClient(conn net.Conn) {
-	defer connectionClose(conn)
 	var client Client;
 	//获取客户端地址
 	address := conn.RemoteAddr().String();
@@ -100,11 +86,6 @@ func main() {
 	for {
 		listenerConn(listen_socket);
 	}
-}
-
-func connectionClose(conn net.Conn) {
-	conn.Close();
-	fmt.Println("conn连接关闭")
 }
 
 func lisenerClose(socket net.Listener) {
