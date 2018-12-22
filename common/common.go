@@ -37,6 +37,13 @@ func ServerAddr() string {
 	return constant.SERVER_ADDR + ":" + constant.SERVER_PORT;
 }
 
-func Hello() {
-	fmt.Println("hello")
+/**
+错误检查
+ */
+func CheckError(err error, message string) bool {
+	if (nil != err) {
+		fmt.Println(message + err.Error())
+		return false;
+	}
+	return true;
 }
