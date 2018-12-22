@@ -8,6 +8,8 @@ type Client struct {
 	Addr string
 	//姓名
 	Name string
+	//通讯内容
+	Channel chan string;
 }
 
 type Chat struct {
