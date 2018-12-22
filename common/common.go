@@ -12,15 +12,14 @@ var writeLock sync.Mutex
 /**
 接收数据
  */
-func Receive(conn net.Conn) string {
-	data := make([]byte, 255)
-	index, err := conn.Read(data);
-	if (err != nil) {
-		fmt.Println("数据读取失败")
+func Receive(conn net.Conn) []byte {
+	var message [] byte = nil;
+	receiveData := make([]byte, 255)
+	index, err := conn.Read(receiveData);
+	if (CheckError(err, "数据读取失败")) {
+		message = receiveData[0:index];
 	}
-	var msg = string(data[0:index])
-	fmt.Printf("接收到数据%v\n", msg)
-	return msg;
+	return message;
 }
 
 /**
