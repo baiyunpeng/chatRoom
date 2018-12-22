@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/baiyunpeng/chatRoom/const"
 	"github.com/baiyunpeng/chatRoom/modes"
-	"github.com/baiyunpeng/chatRoom/common"
 	"encoding/json"
 )
 
@@ -42,9 +41,9 @@ func MonitorConn(conn net.Conn, listener connListener) {
 	go func() {
 		chat := &modes.Chat{};
 		for {
-			message := common.Receive(conn);
+			message := Receive(conn);
 			err := json.Unmarshal(message, chat);
-			if common.CheckError(err, "转换消息失败") {
+			if CheckError(err, "转换消息失败") {
 				listener(*chat);
 			}
 		}
