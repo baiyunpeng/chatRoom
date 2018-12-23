@@ -6,83 +6,81 @@ import (
 	"github.com/baiyunpeng/chatRoom/const"
 	"github.com/baiyunpeng/chatRoom/common"
 	"github.com/baiyunpeng/chatRoom/modes"
-	"strings"
+	"encoding/json"
 )
 
 //储存在线用户的map
-var onlieclient = make(map[string]Client)
-//管道间的消息
-var channelMessage = make(chan string)
+var onlieclient = make(map[string]modes.Client)
+//管道对象
+var channelChatChannel = make(chan modes.Chat)
 
 //遍历管道消息
-func pushonline() {
+func handelData() {
 	for {
-		pushmsg := <-channelMessage
-		for _, client := range onlieclient {
-			client.channel <- pushmsg
+		chat := <-channelChatChannel
+		//连接
+		if chat.CallType == constant.CALL_TYPE_COMMOND {
+			handelCommonData(chat)
+		} else if chat.CallType == constant.CALL_TYPE_GROUP {
+			fmt.Println("CALL_TYPE_GROUP", chat)
+		} else if chat.CallType == constant.CALL_TYPE_BROADCAST {
+			fmt.Println("CALL_TYPE_BROADCAST", chat)
+		} else if chat.CallType == constant.CALL_TYPE_P2P {
+			fmt.Println("CALL_TYPE_P2P", chat)
 		}
 	}
+}
+
+func handelCommonData(chat modes.Chat){
+	if chat.Message == constant.CALL_COMMON_CONNECTION {
+		registerClietn(chat);
+	}else if chat.Message == constant.CALL_COMMON_CLOSE {
+		fmt.Println("CALL_COMMON_CLOSE",chat)
+	}
+}
+func registerClietn(chat modes.Chat) {
+	client := modes.Client{chat.Name, chat.Name, make(chan string)}
+	onlieclient[chat.Name] = client;
 }
 
 func listenerConn(socket net.Listener) {
 	fmt.Println("服务监听启动成功，等待消息...")
 	conn, err := socket.Accept();
-	if (err != nil) {
-		fmt.Println("服务器监听失败")
+	if !common.CheckError(err, "服务器监听失败") {
+		return
 	}
 	fmt.Println("连接服务器成功")
-	initClient(conn);
+	common.MonitorConn(conn, monitorConn)
 }
 
-func initClient(conn net.Conn) {
-	var client Client;
-	//获取客户端地址
-	address := conn.RemoteAddr().String();
-	//打印连接成功
-	fmt.Printf("[%s]:%s\n", address, "连接成功")
-	clientLoginRotocol := common.Receive(conn);
-	//有登录协议
-	if (strings.HasPrefix(clientLoginRotocol, constant.CLIENT_LOGIN_PROTOCOL)) {
-		common.SendMessage(conn, constant.CLIENT_CONN_SUCCESS)
-		clientName := clientLoginRotocol[len(constant.CLIENT_LOGIN_PROTOCOL):]
-		//创建Client对象
-		client = Client{address, clientName, make(chan string), conn}
-		//将client放入map集合
-		onlieclient[clientName+":"+address] = client
-		fmt.Println("更新后:", onlieclient)
-		message := fmt.Sprintf("用户%v登录了，地址:%v", clientName, address)
-		//广播上线信息
-		broadcast(message)
-		go handelData(conn);
-	}
-}
-
-func handelData(conn net.Conn) {
-	for {
-		fmt.Println("接收客户端消息")
-		message := common.Receive(conn);
-		fmt.Println(message)
-		broadcast(message)
-	}
+//监听连接
+func monitorConn(chat modes.Chat) {
+	channelChatChannel <- chat;
 }
 
 /**
 广播消息
  */
 func broadcast(message string) {
-	/*	for _, client := range onlieclient {
-			common.SendMessage(client.conn, message);
-		}*/
+	chat := modes.Chat{"", "", constant.CALL_TYPE_BROADCAST, message, ""}
+	messageByte,err:=json.Marshal(chat);
+	if common.CheckError(err,"数据转换失败"){
+		for _, client := range onlieclient {
+			client.Channel
+		}
+	}
+
 }
 
 func main() {
 	fmt.Printf("服务端启动，地址：%v,端口号%v\n", constant.SERVER_ADDR, constant.SERVER_PORT)
 	listen_socket, err := net.Listen(constant.SERVER_PROTOCOL, common.ServerAddr())
-	if (err != nil) {
-		fmt.Println("服务器启动监听失败")
+	if !common.CheckError(err, "服务器启动监听失败") {
+		return;
 	}
 	//延时关闭监听
 	defer lisenerClose(listen_socket)
+	go handelData();
 	for {
 		listenerConn(listen_socket);
 	}
