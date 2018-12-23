@@ -3,44 +3,47 @@ package main
 import (
 	"net"
 	"fmt"
-	"github.com/baiyunpeng/chatRoom/const"
-	"github.com/baiyunpeng/chatRoom/common"
-	"github.com/baiyunpeng/chatRoom/modes"
-	"encoding/json"
+	"../const"
+	"../common"
+	"../modes"
 )
 
 //储存在线用户的map
 var onlieclient = make(map[string]modes.Client)
-//管道对象
-var channelChatChannel = make(chan modes.Chat)
 
 //遍历管道消息
-func handelData() {
-	for {
-		chat := <-channelChatChannel
-		//连接
-		if chat.CallType == constant.CALL_TYPE_COMMOND {
-			handelCommonData(chat)
-		} else if chat.CallType == constant.CALL_TYPE_GROUP {
-			fmt.Println("CALL_TYPE_GROUP", chat)
-		} else if chat.CallType == constant.CALL_TYPE_BROADCAST {
-			fmt.Println("CALL_TYPE_BROADCAST", chat)
-		} else if chat.CallType == constant.CALL_TYPE_P2P {
-			fmt.Println("CALL_TYPE_P2P", chat)
-		}
+func handelData(chat modes.Chat, conn net.Conn) {
+	//连接
+	if chat.CallType == constant.CALL_TYPE_COMMOND {
+		handelCommonData(chat, conn)
+	} else if chat.CallType == constant.CALL_TYPE_GROUP {
+		fmt.Println("CALL_TYPE_GROUP", chat)
+	} else if chat.CallType == constant.CALL_TYPE_BROADCAST {
+		broadcast(chat);
+	} else if chat.CallType == constant.CALL_TYPE_P2P {
+		p2p(chat)
 	}
 }
 
-func handelCommonData(chat modes.Chat){
+func handelCommonData(chat modes.Chat, conn net.Conn) {
 	if chat.Message == constant.CALL_COMMON_CONNECTION {
-		registerClietn(chat);
-	}else if chat.Message == constant.CALL_COMMON_CLOSE {
-		fmt.Println("CALL_COMMON_CLOSE",chat)
+		registerClietn(chat, conn);
+	} else if chat.Message == constant.CALL_COMMON_CLOSE {
+		closeClietn(chat)
 	}
 }
-func registerClietn(chat modes.Chat) {
-	client := modes.Client{chat.Name, chat.Name, make(chan string)}
-	onlieclient[chat.Name] = client;
+func registerClietn(chat modes.Chat, conn net.Conn) {
+	client := modes.Client{chat.Sender, chat.Sender, make(chan modes.Chat)}
+	onlieclient[chat.Sender] = client
+	common.MonitorChat(conn, client)
+	onlineChat := modes.Chat{chat.Sender, "", constant.CALL_TYPE_BROADCAST, chat.Sender + "上线了", ""}
+	broadcast(onlineChat);
+}
+
+func closeClietn(chat modes.Chat) {
+	client := onlieclient[chat.Sender]
+	client.Channel <- chat;
+	delete(onlieclient, chat.Sender)
 }
 
 func listenerConn(socket net.Listener) {
@@ -54,20 +57,30 @@ func listenerConn(socket net.Listener) {
 }
 
 //监听连接
-func monitorConn(chat modes.Chat) {
-	channelChatChannel <- chat;
+func monitorConn(chat modes.Chat, conn net.Conn) {
+	handelData(chat, conn)
 }
 
 /**
 广播消息
  */
-func broadcast(message string) {
-	chat := modes.Chat{"", "", constant.CALL_TYPE_BROADCAST, message, ""}
-	messageByte,err:=json.Marshal(chat);
-	if common.CheckError(err,"数据转换失败"){
-		for _, client := range onlieclient {
-			client.Channel
+func broadcast(chat modes.Chat) {
+	broadcastChat := modes.Chat{chat.Sender, chat.Receiver, constant.CALL_TYPE_BROADCAST, chat.Message, ""}
+	fmt.Println(chat.Sender, "对", "所有人说：", chat.Message)
+	for _, client := range onlieclient {
+		if client.Name != chat.Sender {
+			client.Channel <- broadcastChat
 		}
+	}
+}
+
+func p2p(chat modes.Chat) {
+	p2pChat := modes.Chat{chat.Sender, chat.Receiver, constant.CALL_TYPE_P2P, chat.Message, ""}
+	if client, ok := onlieclient[chat.Receiver]; ok {
+		client.Channel <- p2pChat
+		fmt.Println(chat.Sender, "对", chat.Receiver, "说：", chat.Message)
+	} else {
+		fmt.Println(chat.Receiver, "不存在")
 	}
 
 }
@@ -80,7 +93,6 @@ func main() {
 	}
 	//延时关闭监听
 	defer lisenerClose(listen_socket)
-	go handelData();
 	for {
 		listenerConn(listen_socket);
 	}

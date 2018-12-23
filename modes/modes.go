@@ -13,8 +13,8 @@ type Client struct {
 }
 
 type Chat struct {
-	Name     string
-	TellName string
+	Sender   string
+	Receiver string
 	CallType string
 	Message  string
 	Group    string

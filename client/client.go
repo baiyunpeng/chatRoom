@@ -3,10 +3,11 @@ package main
 import (
 	"net"
 	"fmt"
-	"github.com/baiyunpeng/chatRoom/const"
-	"github.com/baiyunpeng/chatRoom/common"
-	"github.com/baiyunpeng/chatRoom/modes"
+	"../const"
+	"../common"
+	"../modes"
 	"encoding/json"
+	"strings"
 )
 
 //管道对象
@@ -51,19 +52,27 @@ func connectionClose(conn net.Conn) {
 }
 
 //监听连接
-func monitorConn(chat modes.Chat) {
+func monitorConn(chat modes.Chat, conn net.Conn) {
 	channelChatChannel <- chat;
 }
 
 func handelData() {
 	for {
 		chat := <-channelChatChannel
-		fmt.Println(chat)
+		fmt.Println(chat.Sender, ":", chat.Message)
 	}
 }
 
 func sendMessage(nick string, message string, conn net.Conn) {
-	chat := modes.Chat{nick, "", constant.CALL_TYPE_P2P, message, ""}
+	var receiver string = "";
+	var callType string = constant.CALL_TYPE_BROADCAST;
+	if strings.HasPrefix(message, "@") {
+		index := strings.Index(message, ":")
+		receiver = message[1:index]
+		message = message[index+1:]
+		callType = constant.CALL_TYPE_P2P
+	}
+	chat := modes.Chat{nick, receiver, callType, message, ""}
 	messageByte, err := json.Marshal(chat);
 	if common.CheckError(err, "数据转换失败") {
 		conn.Write(messageByte);
